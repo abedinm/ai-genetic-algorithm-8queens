@@ -1,0 +1,2290 @@
+<title>Queens and Roulette Wheels</title>
+<style>
+  :root {
+    --paper: #e9edee;
+    --card: #fbfcfc;
+    --card-2: #f2f5f5;
+    --ink: #10191d;
+    --ink-soft: #4e6167;
+    --ink-faint: #7d9198;
+    --rule: #cbd6d8;
+    --accent: #0d5f61;
+    --accent-soft: #d3e5e4;
+    --attack: #bd4230;
+    --attack-soft: #f6dcd6;
+    --gold: #97701f;
+    --gold-soft: #f0e3c4;
+    --light-sq: #dfe6e6;
+    --dark-sq: #b6c6c7;
+
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, "Liberation Mono", monospace;
+    --sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0d1315;
+      --card: #151f22;
+      --card-2: #1b262a;
+      --ink: #dfe6e6;
+      --ink-soft: #9db0b4;
+      --ink-faint: #6d8286;
+      --rule: #2b393d;
+      --accent: #4ec5c2;
+      --accent-soft: #123a3b;
+      --attack: #f0705a;
+      --attack-soft: #40201b;
+      --gold: #e0ad4a;
+      --gold-soft: #3b3018;
+      --light-sq: #2c3b3f;
+      --dark-sq: #1c282b;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #0d1315;
+    --card: #151f22;
+    --card-2: #1b262a;
+    --ink: #dfe6e6;
+    --ink-soft: #9db0b4;
+    --ink-faint: #6d8286;
+    --rule: #2b393d;
+    --accent: #4ec5c2;
+    --accent-soft: #123a3b;
+    --attack: #f0705a;
+    --attack-soft: #40201b;
+    --gold: #e0ad4a;
+    --gold-soft: #3b3018;
+    --light-sq: #2c3b3f;
+    --dark-sq: #1c282b;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 22px 120px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header.top {
+    padding: 64px 0 40px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(30px, 6vw, 50px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 19px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0;
+  }
+
+  .sourcelist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 26px;
+  }
+
+  .src {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    padding: 5px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    color: var(--ink-soft);
+    background: var(--card);
+  }
+
+  /* ---------- sections ---------- */
+
+  section { padding-top: 66px; }
+
+  h2 {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 6px;
+    font-weight: 700;
+  }
+
+  h2 + .h2sub {
+    font-family: var(--mono);
+    font-size: clamp(21px, 3.6vw, 30px);
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    font-weight: 700;
+    margin: 0 0 22px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin: 36px 0 10px;
+    font-weight: 700;
+  }
+
+  p { max-width: 66ch; margin: 0 0 16px; }
+
+  a { color: var(--accent); }
+
+  strong { font-weight: 700; }
+
+  code, .chr {
+    font-family: var(--mono);
+    font-size: 0.93em;
+    background: var(--card-2);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1px 5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- panels ---------- */
+
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 24px 26px;
+    margin: 26px 0;
+  }
+
+  .panel.warn { border-left-color: var(--attack); }
+
+  .panel-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 12px;
+  }
+
+  .formula {
+    font-family: var(--mono);
+    font-size: clamp(15px, 2.6vw, 19px);
+    line-height: 1.9;
+    font-variant-numeric: tabular-nums;
+    overflow-x: auto;
+    margin: 0;
+  }
+
+  .formula .hl { color: var(--attack); font-weight: 700; }
+  .formula .hl2 { color: var(--accent); font-weight: 700; }
+
+  /* ---------- tables ---------- */
+
+  .tablewrap { overflow-x: auto; margin: 20px 0; }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 460px;
+    font-size: 14.5px;
+    font-variant-numeric: tabular-nums;
+    background: var(--card);
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--ink-faint);
+    font-weight: 700;
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--ink);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  td.num, th.num { text-align: right; font-family: var(--mono); }
+  td.mono { font-family: var(--mono); }
+
+  tr.total td {
+    border-top: 2px solid var(--ink);
+    border-bottom: none;
+    font-weight: 700;
+  }
+
+  tr.best td { background: var(--accent-soft); }
+
+  .dim { color: var(--ink-faint); }
+  .bad { color: var(--attack); font-weight: 700; }
+  .good { color: var(--accent); font-weight: 700; }
+
+  /* ---------- chess boards ---------- */
+
+  .boards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    margin: 24px 0;
+  }
+
+  .boardbox { flex: 0 0 auto; }
+
+  .boardcap {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin: 10px 0 0;
+    max-width: 30ch;
+    line-height: 1.5;
+  }
+
+  .boardcap b { color: var(--ink); }
+
+  .board {
+    display: grid;
+    border: 2px solid var(--ink);
+    width: max-content;
+  }
+
+  .sq {
+    display: grid;
+    place-items: center;
+    font-size: 0.72em;
+    position: relative;
+    line-height: 1;
+  }
+
+  .sq.light { background: var(--light-sq); }
+  .sq.dark { background: var(--dark-sq); }
+  .sq.path { background: var(--attack-soft); }
+  .sq .q { color: var(--gold); font-weight: 700; }
+  .sq.hit .q { color: var(--attack); }
+  .sq.hit { outline: 2px solid var(--attack); outline-offset: -2px; z-index: 1; }
+
+  .axis {
+    display: grid;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .axis.left { text-align: right; padding-right: 5px; align-items: center; }
+  .axis.bottom { text-align: center; padding-top: 5px; }
+
+  .boardgrid {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    width: max-content;
+  }
+
+  /* ---------- bit strips ---------- */
+
+  .strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    margin: 5px 0;
+    flex-wrap: wrap;
+  }
+
+  .strip .lbl {
+    width: 92px;
+    flex: 0 0 92px;
+    color: var(--ink-faint);
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .bits { display: flex; }
+
+  .bit {
+    width: 26px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--rule);
+    margin-left: -1px;
+    background: var(--card);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bit.tail { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .bit.mid { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .bit.flip { background: var(--attack-soft); color: var(--attack); font-weight: 700; border-color: var(--attack); }
+  .bit.cut { border-left: 2px dashed var(--attack); }
+
+  .arrow {
+    font-family: var(--mono);
+    color: var(--ink-faint);
+    margin: 4px 0 4px 102px;
+    font-size: 13px;
+  }
+
+  /* ---------- steps ---------- */
+
+  ol.steps { counter-reset: s; list-style: none; padding: 0; margin: 22px 0; }
+
+  ol.steps > li {
+    counter-increment: s;
+    position: relative;
+    padding: 0 0 22px 52px;
+    border-left: 1px solid var(--rule);
+    margin-left: 15px;
+  }
+
+  ol.steps > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+
+  ol.steps > li::before {
+    content: counter(s);
+    position: absolute;
+    left: -15px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: var(--accent);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 50%;
+  }
+
+  ol.steps h4 {
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 4px 0 8px;
+    color: var(--ink);
+  }
+
+  ol.steps p { margin-bottom: 10px; }
+
+  /* ---------- calculator ---------- */
+
+  .calc {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    border-radius: 3px;
+    padding: 26px;
+    margin: 26px 0;
+  }
+
+  .calcrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: flex-end;
+    margin-bottom: 22px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .field input, .field select {
+    font-family: var(--mono);
+    font-size: 17px;
+    padding: 9px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--card-2);
+    color: var(--ink);
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .field input { width: 190px; }
+
+  .field input:focus-visible, .field select:focus-visible,
+  button:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .presets { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 20px; }
+
+  .presets button {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 10px;
+    border: 1px solid var(--rule);
+    background: var(--card-2);
+    color: var(--ink-soft);
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+  }
+
+  .presets button:hover { border-color: var(--accent); color: var(--accent); }
+
+  .calcout { display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start; }
+
+  .scorecard { flex: 1 1 250px; min-width: 240px; }
+
+  .bigscore {
+    font-family: var(--mono);
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bigscore .of { font-size: 20px; color: var(--ink-faint); }
+
+  .scoreline {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 8px;
+    line-height: 1.8;
+    font-variant-numeric: tabular-nums;
+  }
+
+  ul.pairs { list-style: none; padding: 0; margin: 14px 0 0; }
+
+  ul.pairs li {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  ul.pairs li:hover { color: var(--attack); }
+  ul.pairs li.on { color: var(--attack); font-weight: 700; }
+  ul.pairs li .tag {
+    display: inline-block;
+    min-width: 62px;
+    color: var(--attack);
+  }
+
+  .nopairs { color: var(--accent); font-weight: 700; font-family: var(--mono); font-size: 13px; }
+
+  /* ---------- reveal ---------- */
+
+  details {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    margin: 14px 0;
+    overflow: hidden;
+  }
+
+  summary {
+    cursor: pointer;
+    padding: 15px 18px;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  summary::-webkit-details-marker { display: none; }
+
+  summary::before {
+    content: "▸";
+    font-family: var(--mono);
+    color: var(--accent);
+    flex: 0 0 auto;
+  }
+
+  details[open] summary::before { content: "▾"; }
+
+  details[open] summary { border-bottom: 1px solid var(--rule); }
+
+  .answer { padding: 18px; background: var(--card-2); }
+  .answer > :last-child { margin-bottom: 0; }
+
+  .qnum {
+    font-family: var(--mono);
+    color: var(--ink-faint);
+    font-size: 13px;
+    flex: 0 0 auto;
+  }
+
+  /* ---------- misc ---------- */
+
+  .rank { list-style: none; padding: 0; margin: 22px 0; counter-reset: r; }
+
+  .rank li {
+    counter-increment: r;
+    display: flex;
+    gap: 16px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .rank li::before {
+    content: counter(r);
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    flex: 0 0 32px;
+    line-height: 1.2;
+  }
+
+  .rank .why { color: var(--ink-soft); font-size: 14.5px; display: block; margin-top: 3px; }
+
+  ul.traps { list-style: none; padding: 0; margin: 18px 0; }
+
+  ul.traps li {
+    padding: 12px 0 12px 30px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    max-width: 68ch;
+  }
+
+  ul.traps li::before {
+    content: "✕";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    color: var(--attack);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+
+  .wheelwrap { display: flex; flex-wrap: wrap; gap: 32px; align-items: center; margin: 24px 0; }
+
+  .legend { list-style: none; padding: 0; margin: 0; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .legend li { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+  .swatch { width: 14px; height: 14px; border: 1px solid var(--ink); flex: 0 0 14px; }
+
+  /* ---------- drills + exam ---------- */
+
+  .drill {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    border-radius: 3px;
+    padding: 24px;
+    margin: 24px 0;
+  }
+
+  .drill h3 { margin-top: 0; }
+
+  .drillrow { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 14px 0; }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding: 10px 16px;
+    border: 2px solid var(--ink);
+    background: var(--accent);
+    color: var(--paper);
+    border-radius: 2px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .btn.ghost { background: var(--card-2); color: var(--ink); border-color: var(--rule); font-weight: 400; }
+  .btn:hover { filter: brightness(1.1); }
+
+  .ansinput {
+    font-family: var(--mono);
+    font-size: 17px;
+    padding: 9px 11px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--card-2);
+    color: var(--ink);
+    width: 110px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+  }
+
+  .ansinput.wide { width: 190px; }
+  .ansinput.ok { border-color: var(--accent); background: var(--accent-soft); }
+  .ansinput.no { border-color: var(--attack); background: var(--attack-soft); }
+
+  .verdict { font-family: var(--mono); font-size: 14px; font-weight: 700; }
+  .verdict.ok { color: var(--accent); }
+  .verdict.no { color: var(--attack); }
+
+  .bigchrom {
+    font-family: var(--mono);
+    font-size: clamp(26px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    margin: 10px 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .drillmeta { font-family: var(--mono); font-size: 12.5px; color: var(--ink-faint); }
+
+  .streak { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  .reveal-zone { margin-top: 16px; }
+
+  .examq {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 22px 24px;
+    margin: 18px 0;
+  }
+
+  .examq h3 { margin-top: 0; }
+
+  .examq .marks { font-family: var(--mono); font-size: 12px; color: var(--ink-faint); }
+
+  .exam-select {
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--card-2);
+    color: var(--ink);
+    max-width: 100%;
+  }
+
+  .stepcheck { list-style: none; padding: 0; margin: 10px 0; }
+  .stepcheck li { padding: 5px 0; display: flex; gap: 10px; align-items: baseline; font-size: 15px; }
+  .stepcheck input { accent-color: var(--accent); }
+
+  .scorebar {
+    position: sticky;
+    bottom: 12px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    padding: 12px 18px;
+    border-radius: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
+    z-index: 5;
+  }
+
+  .scorebar .fill {
+    flex: 1;
+    height: 8px;
+    background: color-mix(in srgb, var(--paper) 25%, transparent);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .scorebar .fill > div { height: 100%; width: 0%; background: var(--gold); transition: width 0.3s; }
+
+  .parentpick { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .parentpick button {
+    font-family: var(--mono);
+    font-size: 15px;
+    padding: 9px 14px;
+    border: 1px solid var(--rule);
+    background: var(--card-2);
+    color: var(--ink);
+    border-radius: 2px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+  }
+
+  .parentpick button.ok { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .parentpick button.no { border-color: var(--attack); background: var(--attack-soft); }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 26px;
+    border-top: 2px solid var(--ink);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    line-height: 1.9;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .strip .lbl { width: 100%; flex: 1 0 100%; }
+    .arrow { margin-left: 0; }
+    .bit { width: 23px; height: 27px; }
+  }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <p class="eyebrow">CSC4226 · Artificial Intelligence · Quiz Prep</p>
+  <h1>Queens and Roulette Wheels</h1>
+  <p class="standfirst">Everything the next theory quiz can ask about selection, genetic algorithms, and the 8-queens problem — with every number worked out, every board drawn, and a calculator to drill the one question that is almost certain to appear.</p>
+  <div class="sourcelist">
+    <span class="src">Lecture 4 — Local Search</span>
+    <span class="src">Lecture 5 — Genetic Algorithms</span>
+    <span class="src">GA numerical example</span>
+    <span class="src">8Queen slides</span>
+  </div>
+</header>
+
+<!-- ============ 1. THE CORE ============ -->
+<section id="core">
+  <h2>Start here</h2>
+  <p class="h2sub">Three things carry most of the marks</p>
+
+  <p>Across your four files, the same three skills are drilled again and again. If you can do these cold, you can answer most of the paper.</p>
+
+  <div class="panel">
+    <p class="panel-label">The whole quiz in three lines</p>
+    <p class="formula">
+      <span class="hl2">1.</span> fitness of a queens board &nbsp;=&nbsp; <span class="hl2">C(n,2)</span> − <span class="hl">attacking pairs</span><br>
+      <span class="hl2">2.</span> selection probability &nbsp;=&nbsp; <span class="hl2">f<sub>i</sub></span> ÷ <span class="hl2">Σf</span> &nbsp;→&nbsp; cumulative bins &nbsp;→&nbsp; spin<br>
+      <span class="hl2">3.</span> one GA cycle &nbsp;=&nbsp; select → crossover → mutate → accept → update
+    </p>
+  </div>
+
+  <p>And one definition, worth memorising word for word, because it is the classic opening question:</p>
+
+  <div class="panel">
+    <p class="panel-label">Definition — quote this</p>
+    <p style="margin:0"><em>“A genetic algorithm is a variant of <strong>stochastic beam search</strong> in which successor states are generated by <strong>combining two parent states</strong> rather than by modifying a single state.”</em></p>
+  </div>
+</section>
+
+<!-- ============ 2. 8 QUEENS REPRESENTATION ============ -->
+<section id="repr">
+  <h2>8-Queens · Part 1</h2>
+  <p class="h2sub">How a chessboard becomes a string of digits</p>
+
+  <p>A chromosome for 8-queens is <strong>eight digits</strong>. The <strong>position</strong> in the string is the column; the <strong>digit</strong> is the row that column's queen sits in.</p>
+
+  <div class="panel">
+    <p class="panel-label">Reading the chromosome 24748552</p>
+    <p class="formula" style="font-size:15px">
+      column &nbsp;&nbsp;1&nbsp; 2&nbsp; 3&nbsp; 4&nbsp; 5&nbsp; 6&nbsp; 7&nbsp; 8<br>
+      digit &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl2">2&nbsp; 4&nbsp; 7&nbsp; 4&nbsp; 8&nbsp; 5&nbsp; 5&nbsp; 2</span><br>
+      <span style="color:var(--ink-faint)">↑ column 3's queen is in row 7</span>
+    </p>
+  </div>
+
+  <p>This encoding is clever for one reason worth stating in an answer: because each column gets exactly one digit, <strong>two queens can never share a column</strong>. The representation removes one whole class of conflict for free, so you only ever check <strong>rows</strong> and <strong>diagonals</strong>.</p>
+
+  <div class="boards" id="board-intro"></div>
+</section>
+
+<!-- ============ 3. COUNTING ATTACKS ============ -->
+<section id="counting">
+  <h2>8-Queens · Part 2</h2>
+  <p class="h2sub">Counting attacks without losing your place</p>
+
+  <p>Two queens attack each other if they share a <strong>row</strong>, or if they share a <strong>diagonal</strong>. The diagonal test is pure arithmetic — no need to trace lines with your finger:</p>
+
+  <div class="panel">
+    <p class="panel-label">The diagonal test</p>
+    <p class="formula">
+      two queens are on a diagonal ⟺ <span class="hl">|Δcolumn| = |Δrow|</span>
+    </p>
+    <p style="margin:14px 0 0;font-size:15px;color:var(--ink-soft)">Column 3 (row 7) and column 8 (row 2): Δcolumn = 5, Δrow = 5. Equal, so they attack.</p>
+  </div>
+
+  <h3>The method that stops double-counting</h3>
+
+  <p>Work left to right. For each queen, only look <strong>rightward</strong> at the queens still ahead of it. Every pair then gets counted exactly once, and your running total can't drift.</p>
+
+  <p>Here is <code>24748552</code> broken into its four attacking pairs — each one on its own board, with the line of attack shaded.</p>
+
+  <div class="boards" id="board-attacks"></div>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Pair</th><th>Rows</th><th>Δcol</th><th>Δrow</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">col 1 &amp; col 8</td><td class="mono">2, 2</td><td class="num">7</td><td class="num">0</td><td class="bad">Same row</td></tr>
+        <tr><td class="mono">col 2 &amp; col 4</td><td class="mono">4, 4</td><td class="num">2</td><td class="num">0</td><td class="bad">Same row</td></tr>
+        <tr><td class="mono">col 3 &amp; col 8</td><td class="mono">7, 2</td><td class="num">5</td><td class="num">5</td><td class="bad">Diagonal — Δ equal</td></tr>
+        <tr><td class="mono">col 6 &amp; col 7</td><td class="mono">5, 5</td><td class="num">1</td><td class="num">0</td><td class="bad">Same row</td></tr>
+        <tr class="total"><td colspan="4">Attacking pairs</td><td class="bad">4</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Your 8Queen slides tally the same thing column by column — <code>1, 1, 1, 0, 0, 1, 0, 0</code>, which sums to 4. Same answer, counted from the other direction.</p>
+
+  <div class="panel">
+    <p class="panel-label">Now convert attacks into fitness</p>
+    <p class="formula">
+      max pairs for 8 queens &nbsp;=&nbsp; C(8,2) &nbsp;=&nbsp; (8 × 7) ÷ 2 &nbsp;=&nbsp; <span class="hl2">28</span><br>
+      fitness(24748552) &nbsp;=&nbsp; 28 − <span class="hl">4</span> &nbsp;=&nbsp; <span class="hl2">24 non-attacking pairs</span><br><br>
+      general form &nbsp;=&nbsp; C(n,2) &nbsp;=&nbsp; n(n−1) ÷ 2 &nbsp;=&nbsp; n! ÷ [2!(n−2)!]
+    </p>
+  </div>
+
+  <p><strong>Fitness counts the pairs that are safe, not the ones that clash.</strong> Higher is better, a perfect 8-queens solution scores 28, and if you write “4” when the question asks for fitness you lose the mark.</p>
+</section>
+
+<!-- ============ 4. CALCULATOR ============ -->
+<section id="calc">
+  <h2>Drill it</h2>
+  <p class="h2sub">Live fitness calculator</p>
+
+  <p>Type any chromosome. The board redraws, every attacking pair is listed with its reason, and the fitness is computed the way the examiner wants it written. Click a pair to highlight it on the board.</p>
+
+  <div class="calc">
+    <div class="calcrow">
+      <div class="field">
+        <label for="chr">Chromosome</label>
+        <input id="chr" value="24748552" autocomplete="off" spellcheck="false" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="origin">Row numbering</label>
+        <select id="origin">
+          <option value="1">Rows start at 1</option>
+          <option value="0">Rows start at 0</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="presets">
+      <button type="button" data-c="24748552" data-o="1">24748552</button>
+      <button type="button" data-c="32752411" data-o="1">32752411</button>
+      <button type="button" data-c="24415124" data-o="1">24415124</button>
+      <button type="button" data-c="32543213" data-o="1">32543213</button>
+      <button type="button" data-c="76012345" data-o="0">76012345</button>
+      <button type="button" data-c="66743210" data-o="0">66743210</button>
+      <button type="button" data-c="211345" data-o="0">211345</button>
+      <button type="button" data-c="403234" data-o="0">403234</button>
+      <button type="button" data-c="511023" data-o="0">511023</button>
+      <button type="button" data-c="13524" data-o="1">13524</button>
+    </div>
+
+    <div class="calcout">
+      <div id="calc-board"></div>
+      <div class="scorecard">
+        <div class="bigscore"><span id="fit">24</span><span class="of"> / <span id="maxfit">28</span></span></div>
+        <div class="scoreline" id="work"></div>
+        <ul class="pairs" id="pairlist"></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. SELECTION ============ -->
+<section id="selection">
+  <h2>Operator 1</h2>
+  <p class="h2sub">Selection — spinning the roulette wheel</p>
+
+  <p>Selection decides <strong>which chromosomes become parents</strong>. The rule is that fitter chromosomes should reproduce more often, but weaker ones must keep a real chance, otherwise the population loses diversity and the search converges on a local optimum.</p>
+
+  <p>Roulette wheel selection gives every chromosome a slice of a wheel proportional to its fitness, then spins once per parent needed.</p>
+
+  <ol class="steps">
+    <li>
+      <h4>Evaluate</h4>
+      <p>Compute f(x) for every chromosome in the population.</p>
+    </li>
+    <li>
+      <h4>Total</h4>
+      <p>Add them up: <code>F = Σf<sub>i</sub></code>. This is the size of the whole wheel.</p>
+    </li>
+    <li>
+      <h4>Probability</h4>
+      <p>Each chromosome's share is <code>p<sub>i</sub> = f<sub>i</sub> / F</code>. These must sum to 1.00 — a fast way to check your arithmetic.</p>
+    </li>
+    <li>
+      <h4>Cumulative bins</h4>
+      <p>Stack the probabilities into ranges. Chromosome 1 owns <code>0 → p₁</code>, chromosome 2 owns <code>p₁ → p₁+p₂</code>, and so on up to 1.00.</p>
+    </li>
+    <li>
+      <h4>Spin</h4>
+      <p>Generate a random number <code>r</code> in [0, 1]. Whichever bin contains <code>r</code> names the parent. Repeat until you have enough parents.</p>
+    </li>
+  </ol>
+
+  <p>Here is the wheel from your own worked example. Notice how string 3 owns more than a third of it, and string 5 owns nothing at all.</p>
+
+  <div class="wheelwrap">
+    <svg viewBox="0 0 200 200" width="220" height="220" role="img" aria-label="Roulette wheel showing selection probabilities: string 3 has the largest slice at 38.3 percent, string 5 has none.">
+      <path d="M100,100 L100,20 A80,80 0 0 1 177.6,80.6 Z" fill="#0d5f61" opacity="0.85"/>
+      <path d="M100,100 L177.6,80.6 A80,80 0 0 1 123.3,176.5 Z" fill="#2b8f8b" opacity="0.85"/>
+      <path d="M100,100 L123.3,176.5 A80,80 0 0 1 31.4,58.8 Z" fill="#bd4230" opacity="0.9"/>
+      <path d="M100,100 L31.4,58.8 A80,80 0 0 1 73.4,24.5 Z" fill="#97701f" opacity="0.85"/>
+      <path d="M100,100 L73.4,24.5 A80,80 0 0 1 100,20 Z" fill="#7d9198" opacity="0.85"/>
+      <circle cx="100" cy="100" r="80" fill="none" stroke="#10191d" stroke-width="2"/>
+      <circle cx="100" cy="100" r="4" fill="#10191d"/>
+    </svg>
+
+    <ul class="legend">
+      <li><span class="swatch" style="background:#0d5f61"></span> String 1 · 10010 · 21.1%</li>
+      <li><span class="swatch" style="background:#2b8f8b"></span> String 2 · 10011 · 24.2%</li>
+      <li><span class="swatch" style="background:#bd4230"></span> String 3 · 10111 · 38.3%</li>
+      <li><span class="swatch" style="background:#97701f"></span> String 4 · 01110 · 11.0%</li>
+      <li><span class="swatch" style="background:transparent;border-style:dashed"></span> String 5 · 00101 · 0%</li>
+      <li><span class="swatch" style="background:#7d9198"></span> String 6 · 01011 · 5.4%</li>
+    </ul>
+  </div>
+
+  <h3>The other selection schemes</h3>
+
+  <p>If the question says “compare” or “name two other methods”, these are the ones to reach for.</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Scheme</th><th>How it works</th><th>Why you'd use it</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">Roulette wheel</td><td>Slice of the wheel ∝ fitness</td><td>The standard, simple to compute</td></tr>
+        <tr><td class="mono">Rank</td><td>Sort the population, slice ∝ <em>rank</em> instead of raw fitness</td><td>Stops one enormous fitness dominating the wheel; also helps when all fitnesses are close together</td></tr>
+        <tr><td class="mono">Tournament</td><td>Pick k chromosomes at random, the fittest wins</td><td>Cheap, and selection pressure is tunable via k</td></tr>
+        <tr><td class="mono">Elitism</td><td>Copy the best 1–2 chromosomes <strong>unchanged</strong> into the next generation</td><td>Guarantees the best solution found is never destroyed by crossover or mutation</td></tr>
+        <tr><td class="mono">Steady-state</td><td>Replace only a few of the worst each generation</td><td>Slow, stable convergence</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel warn">
+    <p class="panel-label">The negative-fitness rule in your course</p>
+    <p style="margin:0">When f(x) comes out <strong>negative</strong>, this course clamps it to <strong>0</strong>. A chromosome with fitness 0 gets probability 0 and therefore <strong>no bin on the wheel at all</strong> — it can never be chosen as a parent. String 5 in the worked example below is exactly this case: x = 5 gives f(x) = −2.5, recorded as 0.</p>
+  </div>
+</section>
+
+<!-- ============ 6. FULL WORKED CYCLE ============ -->
+<section id="cycle">
+  <h2>The big one</h2>
+  <p class="h2sub">One complete GA cycle, every number shown</p>
+
+  <p>This is the worked example from your course, done in full. If the quiz asks you to “perform one iteration of the genetic algorithm”, this is the exact shape of the answer.</p>
+
+  <div class="panel">
+    <p class="panel-label">The problem</p>
+    <p class="formula">
+      maximise &nbsp; <span class="hl2">f(x) = x² / 2 − 3x</span> &nbsp;&nbsp; for &nbsp; x ∈ [0, 31]<br>
+      encoding: binary, <span class="hl2">5 bits</span> &nbsp;&nbsp;<span style="color:var(--ink-faint)">(2⁵ = 32 values, so 0–31 exactly)</span><br>
+      population size: 6
+    </p>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <h4>Initialise and evaluate</h4>
+      <p>Six random 5-bit strings. Decode each to x, then apply f(x). Sum the column to get total fitness, then divide to get each probability, then stack them into bins.</p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Chromosome</th><th class="num">x</th><th class="num">f(x) = x²/2 − 3x</th><th class="num">p<sub>i</sub></th><th>Cumulative bin</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">1</td><td class="mono">10010</td><td class="num">18</td><td class="num">108</td><td class="num">0.211</td><td class="mono">0.001 – 0.211</td></tr>
+            <tr><td class="num">2</td><td class="mono">10011</td><td class="num">19</td><td class="num">123.5</td><td class="num">0.242</td><td class="mono">0.212 – 0.453</td></tr>
+            <tr class="best"><td class="num">3</td><td class="mono">10111</td><td class="num">23</td><td class="num">195.5</td><td class="num">0.383</td><td class="mono">0.454 – 0.836</td></tr>
+            <tr><td class="num">4</td><td class="mono">01110</td><td class="num">14</td><td class="num">56</td><td class="num">0.110</td><td class="mono">0.837 – 0.946</td></tr>
+            <tr><td class="num">5</td><td class="mono">00101</td><td class="num">5</td><td class="num"><span class="bad">0</span> <span class="dim">(raw −2.5)</span></td><td class="num">0</td><td class="dim">— none —</td></tr>
+            <tr><td class="num">6</td><td class="mono">01011</td><td class="num">11</td><td class="num">27.5</td><td class="num">0.054</td><td class="mono">0.947 – 1.00</td></tr>
+            <tr class="total"><td colspan="3">Total</td><td class="num">510.5</td><td class="num">1.00</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="dim" style="font-size:14.5px">Check one row by hand: x = 23 → 23²/2 − 3(23) = 264.5 − 69 = 195.5, and 195.5 ÷ 510.5 = 0.383. ✓</p>
+    </li>
+
+    <li>
+      <h4>Selection — spin four times</h4>
+      <p>Four random numbers are drawn. Each one falls into a bin, and that bin names a parent.</p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th class="num">Random r</th><th>Falls in bin</th><th>Chosen parent</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">0.54</td><td class="mono">0.454 – 0.836 → string 3</td><td class="mono">10111</td></tr>
+            <tr><td class="num">0.88</td><td class="mono">0.837 – 0.946 → string 4</td><td class="mono">01110</td></tr>
+            <tr><td class="num">0.45</td><td class="mono">0.212 – 0.453 → string 2</td><td class="mono">10011</td></tr>
+            <tr><td class="num">0.20</td><td class="mono">0.001 – 0.211 → string 1</td><td class="mono">10010</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </li>
+
+    <li>
+      <h4>Crossover</h4>
+      <p>The parents are paired up and cut before the <strong>last bit</strong>. The tails swap.</p>
+
+      <div class="strip"><span class="lbl">Parent A</span><span class="bits" data-bits="10111" data-cut="4"></span></div>
+      <div class="strip"><span class="lbl">Parent B</span><span class="bits" data-bits="01110" data-cut="4"></span></div>
+      <p class="arrow">↓ swap the shaded tails</p>
+      <div class="strip"><span class="lbl">Child A</span><span class="bits" data-bits="10110" data-cut="4"></span></div>
+      <div class="strip"><span class="lbl">Child B</span><span class="bits" data-bits="01111" data-cut="4"></span></div>
+
+      <div style="height:22px"></div>
+
+      <div class="strip"><span class="lbl">Parent C</span><span class="bits" data-bits="10011" data-cut="4"></span></div>
+      <div class="strip"><span class="lbl">Parent D</span><span class="bits" data-bits="10010" data-cut="4"></span></div>
+      <p class="arrow">↓ swap the shaded tails</p>
+      <div class="strip"><span class="lbl">Child C</span><span class="bits" data-bits="10010" data-cut="4"></span></div>
+      <div class="strip"><span class="lbl">Child D</span><span class="bits" data-bits="10011" data-cut="4"></span></div>
+    </li>
+
+    <li>
+      <h4>Mutation — 1% chance</h4>
+      <p>Only one gene actually flips. Child A's second bit goes from 0 to 1.</p>
+
+      <div class="strip"><span class="lbl">Before</span><span class="bits" data-bits="10110"></span></div>
+      <div class="strip"><span class="lbl">After</span><span class="bits" data-bits="11110" data-flip="1"></span></div>
+
+      <p>The other three offspring pass through untouched — which is exactly what a 1% rate should look like.</p>
+    </li>
+
+    <li>
+      <h4>Accept — re-evaluate the offspring</h4>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Offspring</th><th class="num">x</th><th class="num">f(x)</th><th>Verdict</th></tr>
+          </thead>
+          <tbody>
+            <tr class="best"><td class="mono">11110</td><td class="num">30</td><td class="num">360</td><td class="good">Best so far by a wide margin</td></tr>
+            <tr><td class="mono">01111</td><td class="num">15</td><td class="num">67.5</td><td class="dim">Weak</td></tr>
+            <tr><td class="mono">10010</td><td class="num">18</td><td class="num">108</td><td class="dim">Same as its parent</td></tr>
+            <tr><td class="mono">10011</td><td class="num">19</td><td class="num">123.5</td><td class="dim">Same as its parent</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>That mutation is the whole story of this cycle. Flipping one bit turned a chromosome worth 195.5 into one worth <strong>360</strong> — far above anything in the starting population. This is the example to cite if you're asked <em>why mutation matters</em>.</p>
+    </li>
+
+    <li>
+      <h4>Update the population, then test</h4>
+      <p>The strong offspring joins the population as string 7:</p>
+      <p class="formula" style="font-size:15px">10010, 10011, 10111, 01110, 00101, 01011, <span class="hl2">11110</span></p>
+      <p>Check the termination condition — solution found, generation limit hit, or fitness stopped improving. Not met here, so a new cycle begins from step 1.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- ============ 7. CROSSOVER ============ -->
+<section id="crossover">
+  <h2>Operator 2</h2>
+  <p class="h2sub">Crossover — six variants, one page</p>
+
+  <h3>One-point</h3>
+  <p>A single cut. The child takes the head from one parent and the tail from the other.</p>
+  <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="11011001" data-cut="4"></span></div>
+  <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="01001110" data-cut="4"></span></div>
+  <div class="strip"><span class="lbl">O1</span><span class="bits" data-bits="11011110" data-cut="4"></span></div>
+  <div class="strip"><span class="lbl">O2</span><span class="bits" data-bits="01001001" data-cut="4"></span></div>
+
+  <h3>Two-point</h3>
+  <p>Two cuts. Only the middle segment is exchanged.</p>
+  <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="11011001" data-mid="2,5"></span></div>
+  <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="01001110" data-mid="2,5"></span></div>
+  <div class="strip"><span class="lbl">O1</span><span class="bits" data-bits="11001001" data-mid="2,5"></span></div>
+  <div class="strip"><span class="lbl">O2</span><span class="bits" data-bits="01011110" data-mid="2,5"></span></div>
+
+  <h3>Uniform</h3>
+  <p>Every gene is decided independently, usually by a random mask: a 1 in the mask takes the gene from P1, a 0 takes it from P2.</p>
+  <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="11011001"></span></div>
+  <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="01001110"></span></div>
+  <div class="strip"><span class="lbl">Mask</span><span class="bits" data-bits="10110010" data-mask="1"></span></div>
+  <div class="strip"><span class="lbl">O1</span><span class="bits" data-bits="11001010"></span></div>
+
+  <h3>Arithmetic</h3>
+  <p>An arithmetic operation is applied across the parents — for binary strings a bitwise AND or OR, for real-valued genes a weighted average.</p>
+  <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="11011001"></span></div>
+  <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="01001110"></span></div>
+  <div class="strip"><span class="lbl">O1 = AND</span><span class="bits" data-bits="01001000"></span></div>
+
+  <h3>Heuristic</h3>
+  <p>The only variant that reads the <strong>fitness values</strong>. It pushes the child out beyond the fitter parent, away from the weaker one:</p>
+  <div class="panel">
+    <p class="formula">child = best + r × (best − worst) &nbsp;&nbsp;<span style="color:var(--ink-faint)">where r is random in [0,1]</span></p>
+  </div>
+
+  <h3>Three-parent</h3>
+  <p>Your Lecture 5 gives this an explicit rule, which makes it a likely “apply this” question. Compare P1 and P2 gene by gene:</p>
+
+  <div class="panel">
+    <p class="formula" style="font-size:15px">
+      if &nbsp;P1 = P2&nbsp; → take that bit<br>
+      if &nbsp;P1 ≠ P2&nbsp; → take the bit from <span class="hl2">P3</span>
+    </p>
+  </div>
+
+  <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="011010110100"></span></div>
+  <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="101011011000"></span></div>
+  <div class="strip"><span class="lbl">P3</span><span class="bits" data-bits="011101101101"></span></div>
+  <div class="strip"><span class="lbl">O1</span><span class="bits" data-bits="011011111100" data-flip="0,1,5,6,8,9"></span></div>
+  <p class="dim" style="font-size:14px;margin-left:102px">Shaded genes are the ones where P1 and P2 disagreed, so P3 decided them.</p>
+
+  <p>To produce O2 and O3, run the same rule again with the roles rotated — <code>(P1, P3, P2)</code> and <code>(P2, P3, P1)</code>.</p>
+</section>
+
+<!-- ============ 8. MUTATION ============ -->
+<section id="mutation">
+  <h2>Operator 3</h2>
+  <p class="h2sub">Mutation — and why the rate is tiny</p>
+
+  <p><strong>Flip-bit mutation</strong> on a binary chromosome: pick a gene, flip 0 ↔ 1.</p>
+  <div class="strip"><span class="lbl">Before</span><span class="bits" data-bits="10110"></span></div>
+  <div class="strip"><span class="lbl">After</span><span class="bits" data-bits="11110" data-flip="1"></span></div>
+
+  <p>On a <strong>permutation</strong> chromosome you cannot flip a bit without breaking the permutation, so you <strong>swap two positions</strong> instead — <code>1 5 3 2 6</code> → <code>1 2 3 5 6</code>. On an 8-queens chromosome, mutation means <strong>moving one queen up or down inside its own column</strong>.</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th></th><th>Crossover</th><th>Mutation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">Parents used</td><td>Two</td><td>One</td></tr>
+        <tr><td class="mono">Role</td><td><strong>Exploitation</strong> — recombines good building blocks that already exist</td><td><strong>Exploration</strong> — introduces genes that are nowhere in the population</td></tr>
+        <tr><td class="mono">Probability</td><td>High, roughly 0.6 – 0.9</td><td>Low, roughly 0.01</td></tr>
+        <tr><td class="mono">Remove it and…</td><td>The population stops mixing; the GA decays into parallel hill climbing</td><td>Diversity collapses; the GA converges prematurely on a local optimum</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The rate has to stay low for a concrete reason worth writing out: crossover spends its effort assembling good building blocks, and a high mutation rate would tear them apart faster than they form, degrading the search into a random walk.</p>
+</section>
+
+<!-- ============ 9. WHERE GA SITS ============ -->
+<section id="context">
+  <h2>Context</h2>
+  <p class="h2sub">Where GA sits among the local search algorithms</p>
+
+  <p>Lecture 4 builds up to GA through three simpler algorithms. A “compare these” question is very answerable if you know what each one keeps in memory.</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Algorithm</th><th class="num">States held</th><th>How it moves</th><th>Weakness</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">Hill climbing</td><td class="num">1</td><td>Always to the best uphill neighbour</td><td class="bad">Local maxima, ridges, plateaux</td></tr>
+        <tr><td class="mono">Simulated annealing</td><td class="num">1</td><td>Uphill always; downhill with probability ΔE/T</td><td>Needs a cooling schedule</td></tr>
+        <tr><td class="mono">Local beam search</td><td class="num">k</td><td>Keeps the k best successors of all k states</td><td class="bad">The k states can crowd into one region</td></tr>
+        <tr><td class="mono">Stochastic beam</td><td class="num">k</td><td>Picks k successors at random, biased by value</td><td>Slower to converge</td></tr>
+        <tr class="best"><td class="mono">Genetic algorithm</td><td class="num">k</td><td><strong>Combines two parents</strong> to make each successor</td><td>Many parameters to tune</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Two supporting facts from Lecture 4 that often appear as short-answer marks:</p>
+  <p>Local search is used when <strong>only the final state matters, not the path</strong> — 8-queens, VLSI layout, job-shop scheduling, vehicle routing, portfolio management. Its two advantages are <strong>constant memory</strong> and the ability to work in <strong>very large or continuous</strong> state spaces.</p>
+
+  <h3>The four encodings</h3>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Encoding</th><th>Chromosome looks like</th><th>Suited to</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="mono">Binary</td><td class="mono">10110010</td><td>Knapsack; maximising f(x) over an integer range</td></tr>
+        <tr><td class="mono">Value / real</td><td class="mono">1.23 5.32 0.45</td><td>Neural network weights</td></tr>
+        <tr><td class="mono">Permutation</td><td class="mono">1 5 3 2 6 4</td><td>Travelling salesman; task ordering</td></tr>
+        <tr><td class="mono">Tree</td><td class="mono">(+ x (/ 5 y))</td><td>Genetic programming, evolving expressions</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ 10. PRACTICE ============ -->
+<section id="practice">
+  <h2>Practice</h2>
+  <p class="h2sub">Work these before you open the answers</p>
+
+  <p>These are your lecture's own unsolved exercises plus a set built in the same style. Attempt each one on paper first — reading a solution feels like learning and isn't.</p>
+
+  <h3>Set A — queens fitness</h3>
+
+  <details>
+    <summary><span class="qnum">A1</span><span>Lecture 4 asks: find the number of attacks on chromosome <code>76012345</code>. Columns indexed from 0.</span></summary>
+    <div class="answer">
+      <p>Positions (col, row): (0,7) (1,6) (2,0) (3,1) (4,2) (5,3) (6,4) (7,5)</p>
+      <p><strong>Same row:</strong> none — all eight rows differ.</p>
+      <p><strong>Diagonals:</strong> (0,7)–(1,6) is one pair. Then the six queens (2,0) (3,1) (4,2) (5,3) (6,4) (7,5) all sit on a single ascending diagonal, and six queens on one line means C(6,2) = 15 pairs.</p>
+      <p class="formula">attacks = 1 + 15 = <span class="hl">16</span> &nbsp;&nbsp;→&nbsp;&nbsp; fitness = 28 − 16 = <span class="hl2">12</span></p>
+      <p class="dim">This is the trap in the question: it looks tidy because no two queens share a row, but a long diagonal run is far more expensive than a couple of row clashes.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">A2</span><span>Same question for <code>66743210</code>. Which of the two chromosomes is fitter?</span></summary>
+    <div class="answer">
+      <p>Positions: (0,6) (1,6) (2,7) (3,4) (4,3) (5,2) (6,1) (7,0)</p>
+      <p><strong>Same row:</strong> (0,6) and (1,6) → 1 pair.</p>
+      <p><strong>Diagonals:</strong> (1,6) attacks (2,7), and also (3,4) (4,3) (5,2) (6,1) (7,0) — six pairs from that queen alone. The five queens (3,4) (4,3) (5,2) (6,1) (7,0) form their own descending diagonal → C(5,2) = 10 pairs. Total 16.</p>
+      <p class="formula">attacks = 1 + 16 = <span class="hl">17</span> &nbsp;&nbsp;→&nbsp;&nbsp; fitness = 28 − 17 = <span class="hl2">11</span></p>
+      <p><strong>76012345 is fitter</strong>, 12 against 11.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">A3</span><span>Lecture 4 slide 37: compute the fitness of the 6-queens population <code>211345</code>, <code>403234</code>, <code>511023</code>. Columns from 0.</span></summary>
+    <div class="answer">
+      <p>Maximum pairs = 6 × 5 ÷ 2 = <strong>15</strong>.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Chromosome</th><th class="num">Same-row</th><th class="num">Diagonal</th><th class="num">Attacks</th><th class="num">Fitness</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">211345</td><td class="num">1</td><td class="num">7</td><td class="num">8</td><td class="num">7</td></tr>
+            <tr><td class="mono">403234</td><td class="num">2</td><td class="num">7</td><td class="num">9</td><td class="num">6</td></tr>
+            <tr class="best"><td class="mono">511023</td><td class="num">1</td><td class="num">2</td><td class="num">3</td><td class="num">12</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>511023</strong> is much the fittest. Check it: (0,5) (1,1) (2,1) (3,0) (4,2) (5,3) — columns 1 and 2 share row 1; (2,1)–(3,0) and (4,5)... precisely, (2,1)–(3,0) and (4,2)–(5,3) are the two diagonal pairs. 15 − 3 = 12.</p>
+      <p class="dim">Verify any of these instantly with the calculator above — set row numbering to “start at 0”.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">A4</span><span>Is <code>13524</code> a valid solution to the 5-queens problem?</span></summary>
+    <div class="answer">
+      <p>Positions (rows from 1): (1,1) (2,3) (3,5) (4,2) (5,4). Max pairs = C(5,2) = 10.</p>
+      <p><strong>Same row:</strong> rows are 1, 3, 5, 2, 4 — all different, so none.</p>
+      <p><strong>Diagonals:</strong> check every pair's Δcol against Δrow — 1/2, 2/4, 3/1, 4/3, 1/2, 2/1, 3/1, 1/3, 2/1, 1/2. No pair matches.</p>
+      <p class="formula">attacks = <span class="hl">0</span> &nbsp;&nbsp;→&nbsp;&nbsp; fitness = <span class="hl2">10 / 10</span></p>
+      <p><strong>Yes — it is a perfect solution.</strong></p>
+    </div>
+  </details>
+
+  <h3>Set B — roulette wheel</h3>
+
+  <details>
+    <summary><span class="qnum">B1</span><span>A population has fitness values 40, 30, 20, 10. Build the probability and bin table, then say which chromosome the random numbers 0.15, 0.62 and 0.95 select.</span></summary>
+    <div class="answer">
+      <p>Total fitness F = 40 + 30 + 20 + 10 = <strong>100</strong>.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Chromosome</th><th class="num">Fitness</th><th class="num">p = f/F</th><th>Cumulative bin</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">C1</td><td class="num">40</td><td class="num">0.40</td><td class="mono">0.00 – 0.40</td></tr>
+            <tr><td class="mono">C2</td><td class="num">30</td><td class="num">0.30</td><td class="mono">0.41 – 0.70</td></tr>
+            <tr><td class="mono">C3</td><td class="num">20</td><td class="num">0.20</td><td class="mono">0.71 – 0.90</td></tr>
+            <tr><td class="mono">C4</td><td class="num">10</td><td class="num">0.10</td><td class="mono">0.91 – 1.00</td></tr>
+            <tr class="total"><td>Total</td><td class="num">100</td><td class="num">1.00</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="formula" style="font-size:15px">0.15 → <span class="hl2">C1</span> &nbsp;&nbsp;·&nbsp;&nbsp; 0.62 → <span class="hl2">C2</span> &nbsp;&nbsp;·&nbsp;&nbsp; 0.95 → <span class="hl2">C4</span></p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">B2</span><span>Maximise f(x) = x² for x ∈ [0,31], 5-bit binary. Population: <code>01101</code>, <code>11000</code>, <code>01000</code>, <code>10011</code>. Build the full selection table.</span></summary>
+    <div class="answer">
+      <p>Decode, square, sum: 169 + 576 + 64 + 361 = <strong>1170</strong>.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Chromosome</th><th class="num">x</th><th class="num">f(x) = x²</th><th class="num">p</th><th>Cumulative bin</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">01101</td><td class="num">13</td><td class="num">169</td><td class="num">0.144</td><td class="mono">0.000 – 0.144</td></tr>
+            <tr class="best"><td class="mono">11000</td><td class="num">24</td><td class="num">576</td><td class="num">0.492</td><td class="mono">0.145 – 0.636</td></tr>
+            <tr><td class="mono">01000</td><td class="num">8</td><td class="num">64</td><td class="num">0.055</td><td class="mono">0.637 – 0.692</td></tr>
+            <tr><td class="mono">10011</td><td class="num">19</td><td class="num">361</td><td class="num">0.309</td><td class="mono">0.693 – 1.000</td></tr>
+            <tr class="total"><td>Total</td><td></td><td class="num">1170</td><td class="num">1.000</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Note that <code>11000</code> alone owns nearly half the wheel — this is exactly the situation rank selection exists to soften.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">B3</span><span>Using your B2 table: which chromosomes do random numbers 0.30 and 0.85 select? Then cross them at a cut after bit 4, and flip gene 3 of the first offspring.</span></summary>
+    <div class="answer">
+      <p><strong>Selection.</strong> 0.30 lands in 0.145 – 0.636 → <code>11000</code>. &nbsp; 0.85 lands in 0.693 – 1.000 → <code>10011</code>.</p>
+      <p><strong>Crossover</strong> of the original pair <code>01101</code> and <code>11000</code> at a cut after bit 4:</p>
+      <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="01101" data-cut="4"></span></div>
+      <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="11000" data-cut="4"></span></div>
+      <div class="strip"><span class="lbl">O1</span><span class="bits" data-bits="01100" data-cut="4"></span></div>
+      <div class="strip"><span class="lbl">O2</span><span class="bits" data-bits="11001" data-cut="4"></span></div>
+      <p>O1 = <code>01100</code> = 12, f = 144. O2 = <code>11001</code> = 25, f = 625.</p>
+      <p><strong>Mutation</strong> — flip gene 3 of O1 (the third bit, currently 1):</p>
+      <div class="strip"><span class="lbl">O1 mutated</span><span class="bits" data-bits="01000" data-flip="2"></span></div>
+      <p class="formula">01000 = 8 → f(x) = <span class="hl2">64</span></p>
+      <p class="dim">Here the mutation <em>hurt</em>, dropping 144 to 64. Worth remembering: mutation is a gamble, not an improvement operator. It pays off across many generations, not every time.</p>
+    </div>
+  </details>
+
+  <h3>Set C — operators</h3>
+
+  <details>
+    <summary><span class="qnum">C1</span><span>Apply two-point crossover with cuts after position 2 and position 5 to P1 = <code>11011001</code>, P2 = <code>01001110</code>.</span></summary>
+    <div class="answer">
+      <p>Swap only the middle block (positions 3–5):</p>
+      <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="11011001" data-mid="2,5"></span></div>
+      <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="01001110" data-mid="2,5"></span></div>
+      <div class="strip"><span class="lbl">O1</span><span class="bits" data-bits="11001001" data-mid="2,5"></span></div>
+      <div class="strip"><span class="lbl">O2</span><span class="bits" data-bits="01011110" data-mid="2,5"></span></div>
+      <p class="formula" style="font-size:15px">O1 = <span class="hl2">11001001</span> &nbsp;&nbsp; O2 = <span class="hl2">01011110</span></p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">C2</span><span>Apply three-parent crossover to P1 = <code>011010110100</code>, P2 = <code>101011011000</code>, P3 = <code>011101101101</code> to produce O1.</span></summary>
+    <div class="answer">
+      <p>Gene by gene: where P1 and P2 agree, keep that bit; where they disagree, take P3's bit.</p>
+      <div class="strip"><span class="lbl">P1</span><span class="bits" data-bits="011010110100"></span></div>
+      <div class="strip"><span class="lbl">P2</span><span class="bits" data-bits="101011011000"></span></div>
+      <div class="strip"><span class="lbl">P3</span><span class="bits" data-bits="011101101101"></span></div>
+      <div class="strip"><span class="lbl">O1</span><span class="bits" data-bits="011011111100" data-flip="0,1,5,6,8,9"></span></div>
+      <p>Position by position: differ→P3 gives 0; differ→P3 gives 1; agree→1; agree→0; agree→1; differ→P3 gives 1; differ→P3 gives 1; agree→1; differ→P3 gives 1; differ→P3 gives 1; agree→0; agree→0.</p>
+      <p class="formula" style="font-size:15px">O1 = <span class="hl2">011011111100</span></p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">C3</span><span>Apply one-point crossover with the cut after position 3 to P1 = <code>32752411</code>, P2 = <code>24748552</code>, then state what mutation would mean for these chromosomes.</span></summary>
+    <div class="answer">
+      <p class="formula" style="font-size:15px">
+        O1 = 327 | 48552 = <span class="hl2">32748552</span><br>
+        O2 = 247 | 52411 = <span class="hl2">24752411</span>
+      </p>
+      <p>These are 8-queens chromosomes, so <strong>mutation means changing one digit</strong> — that is, moving a single queen up or down within its own column. Changing <code>24748552</code> to <code>24748152</code> moves the queen in column 6 from row 5 to row 1.</p>
+    </div>
+  </details>
+
+  <h3>Set D — written answers</h3>
+
+  <details>
+    <summary><span class="qnum">D1</span><span>List the six steps of the basic genetic algorithm.</span></summary>
+    <div class="answer">
+      <p><strong>Start</strong> — generate a random population of n chromosomes. <strong>Fitness</strong> — evaluate f(x) for each. <strong>New population</strong> — repeat selection, crossover, mutation and accepting until the new population is full. <strong>Replace</strong> — the new population becomes the current one. <strong>Test</strong> — if the termination condition is met, return the best solution. <strong>Loop</strong> — otherwise go back to the fitness step.</p>
+      <p>Termination conditions: a solution is found, the generation limit is reached, fitness stops improving, or the time budget runs out.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">D2</span><span>Give two differences between crossover and mutation, and say what happens if you remove each.</span></summary>
+    <div class="answer">
+      <p>Crossover takes <strong>two</strong> parents, mutation takes <strong>one</strong>. Crossover <strong>exploits</strong> genetic material already present by recombining it, while mutation <strong>explores</strong> by introducing genes that exist nowhere in the population. Crossover runs at a high probability (0.6–0.9), mutation at a low one (about 0.01).</p>
+      <p>Remove crossover and the population stops mixing, so the GA decays into parallel hill climbing. Remove mutation and diversity collapses, so the GA converges prematurely on a local optimum and can never recover a gene the population has lost.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">D3</span><span>What is elitism, and what failure does it prevent?</span></summary>
+    <div class="answer">
+      <p>Elitism copies the best one or two chromosomes <strong>unchanged</strong> into the next generation, bypassing crossover and mutation entirely.</p>
+      <p>It prevents the best solution found so far from being destroyed. Without it, the fittest chromosome can be cut apart by crossover or damaged by a mutation, and the population's best fitness can actually <em>decrease</em> from one generation to the next.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="qnum">D4</span><span>In this course's GA example, what happens to a chromosome whose f(x) is negative, and what does it mean for its chance of being selected?</span></summary>
+    <div class="answer">
+      <p>Its fitness is <strong>clamped to 0</strong>. String 5 in the worked example is <code>00101</code> = 5, giving f(5) = 12.5 − 15 = −2.5, which is recorded as 0.</p>
+      <p>A fitness of 0 gives a probability of 0, so the chromosome receives <strong>no bin on the roulette wheel at all</strong> and can never be selected as a parent. It survives in the population but contributes nothing to the next generation.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============ 10b. DRILL MACHINES ============ -->
+<section id="drills">
+  <h2>Practice machines</h2>
+  <p class="h2sub">Endless problems, instant marking</p>
+
+  <p>Each machine generates a fresh problem every round. Work it on paper first, type your answer, and the page marks it and shows the full working. These never repeat your slides' numbers, so you're testing the skill, not your memory.</p>
+
+  <div class="drill" id="drill-q">
+    <h3>Machine 1 — Queens fitness</h3>
+    <p>A chromosome appears, <strong>the board stays hidden</strong>. Count the attacking pairs on paper, compute the fitness, type it. The board and every pair are revealed after you answer.</p>
+    <div class="bigchrom" id="dq-chrom">–</div>
+    <p class="drillmeta" id="dq-meta"></p>
+    <div class="drillrow">
+      <input class="ansinput" id="dq-ans" inputmode="numeric" placeholder="fitness" aria-label="Your fitness answer">
+      <button class="btn" id="dq-check" type="button">Check</button>
+      <button class="btn ghost" id="dq-new" type="button">New problem</button>
+      <span class="verdict" id="dq-verdict"></span>
+      <span class="streak" id="dq-streak"></span>
+    </div>
+    <div class="reveal-zone" id="dq-reveal"></div>
+  </div>
+
+  <div class="drill" id="drill-r">
+    <h3>Machine 2 — Roulette wheel</h3>
+    <p>A population appears with its raw f(x) values — including the occasional negative that you must clamp. Compute the total, then decide which chromosome the random number selects.</p>
+    <div id="dr-pop" class="tablewrap"></div>
+    <div class="drillrow">
+      <span class="drillmeta">Step 1 — total fitness after clamping:</span>
+      <input class="ansinput" id="dr-total" inputmode="numeric" placeholder="total" aria-label="Total fitness">
+      <button class="btn" id="dr-checktotal" type="button">Check</button>
+      <span class="verdict" id="dr-tverdict"></span>
+    </div>
+    <div class="drillrow" id="dr-step2" style="display:none">
+      <span class="drillmeta">Step 2 — random number <strong id="dr-r" style="color:var(--accent)"></strong> selects:</span>
+      <span class="parentpick" id="dr-pick"></span>
+    </div>
+    <div class="drillrow">
+      <button class="btn ghost" id="dr-new" type="button">New problem</button>
+      <span class="verdict" id="dr-verdict"></span>
+      <span class="streak" id="dr-streak"></span>
+    </div>
+    <div class="reveal-zone" id="dr-reveal"></div>
+  </div>
+
+  <div class="drill" id="drill-x">
+    <h3>Machine 3 — Crossover</h3>
+    <p>Two parents and a cut. Write both offspring. One-point and two-point problems alternate randomly.</p>
+    <div id="dx-parents"></div>
+    <p class="drillmeta" id="dx-rule"></p>
+    <div class="drillrow">
+      <input class="ansinput wide" id="dx-o1" placeholder="offspring 1" aria-label="Offspring 1" spellcheck="false" autocomplete="off">
+      <input class="ansinput wide" id="dx-o2" placeholder="offspring 2" aria-label="Offspring 2" spellcheck="false" autocomplete="off">
+      <button class="btn" id="dx-check" type="button">Check</button>
+      <button class="btn ghost" id="dx-new" type="button">New problem</button>
+      <span class="verdict" id="dx-verdict"></span>
+      <span class="streak" id="dx-streak"></span>
+    </div>
+    <div class="reveal-zone" id="dx-reveal"></div>
+  </div>
+</section>
+
+<!-- ============ 10c. EXAM MODE ============ -->
+<section id="exam">
+  <h2>Exam mode</h2>
+  <p class="h2sub">The 20-mark quiz, marked live</p>
+
+  <p>Sized like your real quiz: four questions, 20 marks, aim for 20 minutes. Answer everything, then hit <strong>Mark my paper</strong> at the bottom. Nothing here reuses numbers from your slides or from the sections above.</p>
+
+  <div class="examq">
+    <h3>Q1 — Definition and steps <span class="marks">(4 marks)</span></h3>
+    <p>(a) "A genetic algorithm is a variant of ________ in which successor states are generated by ________."</p>
+    <div class="drillrow">
+      <select class="exam-select" id="e1a" aria-label="First blank">
+        <option value="">— first blank —</option>
+        <option value="hc">hill-climbing search</option>
+        <option value="sb">stochastic beam search</option>
+        <option value="sa">simulated annealing</option>
+        <option value="bfs">breadth-first search</option>
+      </select>
+      <select class="exam-select" id="e1b" aria-label="Second blank">
+        <option value="">— second blank —</option>
+        <option value="mut">randomly mutating a single state</option>
+        <option value="comb">combining two parent states</option>
+        <option value="best">expanding the best k successors</option>
+      </select>
+    </div>
+    <p>(b) On paper, list the six steps of the basic GA in order. Then tick the ones you actually wrote down correctly — be honest, this is your score:</p>
+    <ul class="stepcheck" id="e1steps">
+      <li><label><input type="checkbox"> <strong>Start</strong> — generate a random population</label></li>
+      <li><label><input type="checkbox"> <strong>Fitness</strong> — evaluate f(x) for each chromosome</label></li>
+      <li><label><input type="checkbox"> <strong>New population</strong> — selection, crossover, mutation, accepting, until full</label></li>
+      <li><label><input type="checkbox"> <strong>Replace</strong> — new population becomes current</label></li>
+      <li><label><input type="checkbox"> <strong>Test</strong> — check the termination condition</label></li>
+      <li><label><input type="checkbox"> <strong>Loop</strong> — back to the fitness step</label></li>
+    </ul>
+  </div>
+
+  <div class="examq">
+    <h3>Q2 — Queens fitness <span class="marks">(6 marks)</span></h3>
+    <p>8-queens chromosome <span class="bigchrom" style="font-size:26px;display:inline;letter-spacing:0.15em">52463317</span> — rows numbered 1–8. Count on paper, then answer:</p>
+    <div class="drillrow">
+      <label class="drillmeta" for="e2r">Same-row pairs</label>
+      <input class="ansinput" id="e2r" inputmode="numeric">
+      <label class="drillmeta" for="e2d">Diagonal pairs</label>
+      <input class="ansinput" id="e2d" inputmode="numeric">
+      <label class="drillmeta" for="e2f">Fitness</label>
+      <input class="ansinput" id="e2f" inputmode="numeric">
+    </div>
+  </div>
+
+  <div class="examq">
+    <h3>Q3 — Roulette selection <span class="marks">(6 marks)</span></h3>
+    <p>Maximise <strong>f(x) = x² − 5x</strong>, x ∈ [0, 15], 4-bit encoding. Population: <code>1111</code>, <code>0100</code>, <code>1010</code>, <code>0111</code>. Build the full table on paper — x, f(x), probability, cumulative bins — remembering the course's negative-fitness rule. Then answer:</p>
+    <div class="drillrow">
+      <label class="drillmeta" for="e3t">Total fitness</label>
+      <input class="ansinput" id="e3t" inputmode="numeric">
+    </div>
+    <div class="drillrow">
+      <label class="drillmeta">r = 0.43 selects</label>
+      <select class="exam-select e3sel" id="e3s1"><option value="">—</option><option>1111</option><option>0100</option><option>1010</option><option>0111</option></select>
+      <label class="drillmeta">r = 0.87 selects</label>
+      <select class="exam-select e3sel" id="e3s2"><option value="">—</option><option>1111</option><option>0100</option><option>1010</option><option>0111</option></select>
+      <label class="drillmeta">r = 0.95 selects</label>
+      <select class="exam-select e3sel" id="e3s3"><option value="">—</option><option>1111</option><option>0100</option><option>1010</option><option>0111</option></select>
+    </div>
+  </div>
+
+  <div class="examq">
+    <h3>Q4 — Crossover <span class="marks">(4 marks)</span></h3>
+    <p>One-point crossover, cut after position 3, on the 8-queens chromosomes <code>41582736</code> and <code>36174825</code>:</p>
+    <div class="drillrow">
+      <input class="ansinput wide" id="e4o1" placeholder="offspring 1" spellcheck="false" autocomplete="off">
+      <input class="ansinput wide" id="e4o2" placeholder="offspring 2" spellcheck="false" autocomplete="off">
+    </div>
+    <p>What does mutation mean for chromosomes of this kind?</p>
+    <select class="exam-select" id="e4m" style="max-width:100%">
+      <option value="">— choose —</option>
+      <option value="flip">Flip one bit from 0 to 1 or 1 to 0</option>
+      <option value="digit">Change one digit — move one queen within its own column</option>
+      <option value="swap">Swap the two halves of the string</option>
+      <option value="col">Move one queen to a different column</option>
+    </select>
+  </div>
+
+  <div class="scorebar">
+    <button class="btn" id="exam-mark" type="button" style="border-color:var(--paper)">Mark my paper</button>
+    <div class="fill"><div id="exam-fill"></div></div>
+    <span id="exam-score">– / 20</span>
+  </div>
+
+  <div class="reveal-zone" id="exam-reveal"></div>
+</section>
+
+<!-- ============ 11. RANKING ============ -->
+<section id="likely">
+  <h2>Priorities</h2>
+  <p class="h2sub">What the quiz will most likely ask</p>
+
+  <p>Ranked by how heavily each is drilled across your four files.</p>
+
+  <ol class="rank">
+    <li><div><strong>Compute the fitness of an n-queens chromosome</strong><span class="why">Appears in the 8Queen deck, in Lecture 4 slide 26, and again as an unsolved exercise on slide 37. Three separate appearances makes this near-certain. Drill it in the calculator until counting is automatic.</span></div></li>
+    <li><div><strong>Build a roulette wheel selection table</strong><span class="why">Fitness → total → probability → cumulative bin → which parent a given random number picks. This is the whole first half of the GA numerical example.</span></div></li>
+    <li><div><strong>Run one full GA cycle on a small f(x)</strong><span class="why">Initialise, evaluate, select, crossover, mutate, accept, update. The x²/2 − 3x example is the template — expect the same shape with different numbers.</span></div></li>
+    <li><div><strong>Apply a named crossover variant</strong><span class="why">One-point and two-point are the safe bets. Three-parent has its own slide with an explicit stated rule, which makes it a strong candidate for an “apply this rule” question.</span></div></li>
+    <li><div><strong>Define GA and list its steps</strong><span class="why">The stochastic-beam-search definition, plus the six-step loop.</span></div></li>
+    <li><div><strong>Compare</strong><span class="why">Crossover against mutation, or GA against hill climbing and simulated annealing.</span></div></li>
+  </ol>
+</section>
+
+<!-- ============ 12. TRAPS ============ -->
+<section id="traps">
+  <h2>Before you hand it in</h2>
+  <p class="h2sub">Six ways to lose marks you've already earned</p>
+
+  <ul class="traps">
+    <li><strong>Reporting attacks when the question asked for fitness.</strong> Fitness is <em>non-attacking</em> pairs. For <code>24748552</code> the answer is 24, not 4.</li>
+    <li><strong>Double-counting pairs.</strong> Always scan left to right, looking only rightward. Every pair then gets counted once.</li>
+    <li><strong>Missing long diagonals.</strong> Six queens on one diagonal is not six attacks, it is C(6,2) = 15. Question A1 is built entirely on this.</li>
+    <li><strong>Ignoring the stated index origin.</strong> Lecture 4's exercises number columns from 0; the 8Queen board diagram numbers rows from 1. The fitness value is the same either way, but your written positions must match the convention in the question.</li>
+    <li><strong>Forgetting to clamp a negative f(x) to zero</strong> — and then giving that chromosome a bin on the wheel, which shifts every bin after it.</li>
+    <li><strong>Writing that 5 bits encode 0 – 32.</strong> Five bits give 32 values, which is 0 – 31.</li>
+  </ul>
+
+  <div class="panel">
+    <p class="panel-label">One last check</p>
+    <p style="margin:0">In any selection table, your probability column must sum to <strong>1.00</strong> and your last bin must end at <strong>1.00</strong>. If either is off, you have an arithmetic slip somewhere above — and it takes five seconds to catch.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Built from AI-Lecture-05 [Genetic Algorithm], GA example, Updated Spring 25-26 AI Lecture 4 Local Search, and 8Queen.pptx.<br>
+  Fitness values independently recomputed from each chromosome rather than copied from the slides.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var QUEEN = "♛";
+
+  /* ---------- attack logic ---------- */
+
+  function findAttacks(rows) {
+    var out = [];
+    for (var i = 0; i < rows.length; i++) {
+      for (var j = i + 1; j < rows.length; j++) {
+        if (rows[i] === rows[j]) {
+          out.push({ a: i, b: j, kind: "row" });
+        } else if (Math.abs(i - j) === Math.abs(rows[i] - rows[j])) {
+          out.push({ a: i, b: j, kind: "diagonal" });
+        }
+      }
+    }
+    return out;
+  }
+
+  /* cells strictly between two attacking queens */
+  function pathCells(rows, pair) {
+    var cells = [];
+    var c1 = pair.a, c2 = pair.b;
+    var r1 = rows[c1], r2 = rows[c2];
+    var dr = r2 === r1 ? 0 : (r2 > r1 ? 1 : -1);
+    var steps = c2 - c1;
+    for (var s = 1; s < steps; s++) {
+      cells.push({ c: c1 + s, r: r1 + dr * s });
+    }
+    return cells;
+  }
+
+  /* ---------- board rendering ---------- */
+
+  function buildBoard(rows, origin, highlight, cellPx) {
+    var n = rows.length;
+    var px = cellPx || 34;
+    var hi = highlight || [];
+
+    var hitCols = {};
+    var pathMap = {};
+    hi.forEach(function (p) {
+      hitCols[p.a] = true;
+      hitCols[p.b] = true;
+      pathCells(rows, p).forEach(function (cell) {
+        pathMap[cell.c + ":" + cell.r] = true;
+      });
+    });
+
+    var grid = document.createElement("div");
+    grid.className = "boardgrid";
+
+    /* left axis */
+    var left = document.createElement("div");
+    left.className = "axis left";
+    left.style.gridTemplateRows = "repeat(" + n + ", " + px + "px)";
+    for (var t = n - 1; t >= 0; t--) {
+      var lab = document.createElement("div");
+      lab.textContent = String(t + origin);
+      left.appendChild(lab);
+    }
+
+    /* board */
+    var board = document.createElement("div");
+    board.className = "board";
+    board.style.gridTemplateColumns = "repeat(" + n + ", " + px + "px)";
+    board.style.gridTemplateRows = "repeat(" + n + ", " + px + "px)";
+    board.style.fontSize = px + "px";
+
+    for (var rr = n - 1; rr >= 0; rr--) {
+      for (var cc = 0; cc < n; cc++) {
+        var sq = document.createElement("div");
+        sq.className = "sq " + ((rr + cc) % 2 === 0 ? "dark" : "light");
+        if (pathMap[cc + ":" + rr]) sq.className += " path";
+        if (rows[cc] - origin === rr) {
+          if (hitCols[cc]) sq.className += " hit";
+          var q = document.createElement("span");
+          q.className = "q";
+          q.textContent = QUEEN;
+          sq.appendChild(q);
+        }
+        board.appendChild(sq);
+      }
+    }
+
+    /* bottom axis */
+    var bottom = document.createElement("div");
+    bottom.className = "axis bottom";
+    bottom.style.gridTemplateColumns = "repeat(" + n + ", " + px + "px)";
+    for (var c2 = 0; c2 < n; c2++) {
+      var lab2 = document.createElement("div");
+      lab2.textContent = String(c2 + origin);
+      bottom.appendChild(lab2);
+    }
+
+    var spacer = document.createElement("div");
+
+    grid.appendChild(left);
+    grid.appendChild(board);
+    grid.appendChild(spacer);
+    grid.appendChild(bottom);
+    return grid;
+  }
+
+  function boardBox(chrom, origin, highlight, caption, px) {
+    var rows = chrom.split("").map(Number);
+    var box = document.createElement("div");
+    box.className = "boardbox";
+    box.appendChild(buildBoard(rows, origin, highlight, px));
+    if (caption) {
+      var cap = document.createElement("p");
+      cap.className = "boardcap";
+      cap.innerHTML = caption;
+      box.appendChild(cap);
+    }
+    return box;
+  }
+
+  /* ---------- static boards ---------- */
+
+  var INTRO = document.getElementById("board-intro");
+  if (INTRO) {
+    INTRO.appendChild(boardBox(
+      "24748552", 1, [],
+      "<b>24748552</b> on the board. Read it left to right: column 1 → row 2, column 2 → row 4, column 3 → row 7, and so on.",
+      36
+    ));
+  }
+
+  var ATTACKS = document.getElementById("board-attacks");
+  if (ATTACKS) {
+    var rows8 = "24748552".split("").map(Number);
+    var all = findAttacks(rows8);
+    var labels = [
+      "<b>Attack 1</b> — columns 1 and 8, both in row 2. Same row.",
+      "<b>Attack 2</b> — columns 2 and 4, both in row 4. Same row.",
+      "<b>Attack 3</b> — columns 3 and 8. Δcolumn = 5, Δrow = 5. Diagonal.",
+      "<b>Attack 4</b> — columns 6 and 7, both in row 5. Same row."
+    ];
+    /* order the found pairs to match the narrative order in the table */
+    var order = [];
+    [[0,7],[1,3],[2,7],[5,6]].forEach(function (want) {
+      all.forEach(function (p) {
+        if (p.a === want[0] && p.b === want[1]) order.push(p);
+      });
+    });
+    order.forEach(function (p, idx) {
+      ATTACKS.appendChild(boardBox("24748552", 1, [p], labels[idx], 27));
+    });
+  }
+
+  /* ---------- bit strips ---------- */
+
+  document.querySelectorAll(".bits").forEach(function (el) {
+    var bits = el.getAttribute("data-bits") || "";
+    var cut = el.getAttribute("data-cut");
+    var mid = el.getAttribute("data-mid");
+    var flip = el.getAttribute("data-flip");
+    var mask = el.getAttribute("data-mask");
+
+    var cutAt = cut === null ? -1 : parseInt(cut, 10);
+    var midRange = mid ? mid.split(",").map(Number) : null;
+    var flipSet = {};
+    if (flip !== null && flip !== undefined) {
+      flip.split(",").forEach(function (v) { flipSet[parseInt(v, 10)] = true; });
+    }
+
+    bits.split("").forEach(function (b, i) {
+      var d = document.createElement("span");
+      d.className = "bit";
+      if (cutAt >= 0 && i > cutAt) d.className += " tail";
+      if (midRange && i > midRange[0] && i <= midRange[1]) d.className += " mid";
+      if (cutAt >= 0 && i === cutAt + 1) d.className += " cut";
+      if (midRange && (i === midRange[0] + 1 || i === midRange[1] + 1)) d.className += " cut";
+      if (flipSet[i]) d.className = "bit flip";
+      if (mask) d.style.opacity = "0.75";
+      d.textContent = b;
+      el.appendChild(d);
+    });
+  });
+
+  /* ---------- live calculator ---------- */
+
+  var input = document.getElementById("chr");
+  var originSel = document.getElementById("origin");
+  var boardOut = document.getElementById("calc-board");
+  var fitOut = document.getElementById("fit");
+  var maxOut = document.getElementById("maxfit");
+  var workOut = document.getElementById("work");
+  var pairOut = document.getElementById("pairlist");
+
+  var focused = null;
+
+  function render() {
+    var raw = (input.value || "").replace(/[^0-9]/g, "");
+    var origin = parseInt(originSel.value, 10);
+    var n = raw.length;
+
+    boardOut.innerHTML = "";
+    pairOut.innerHTML = "";
+
+    if (n < 2) {
+      fitOut.textContent = "–";
+      maxOut.textContent = "–";
+      workOut.textContent = "Enter at least two digits.";
+      return;
+    }
+
+    var rows = raw.split("").map(Number);
+
+    /* validate against board size and origin */
+    var lo = origin, hi = origin + n - 1;
+    var bad = rows.some(function (r) { return r < lo || r > hi; });
+    if (bad) {
+      fitOut.textContent = "–";
+      maxOut.textContent = "–";
+      workOut.innerHTML = "For a " + n + "-queens board with rows starting at " + origin +
+        ", every digit must be between " + lo + " and " + hi + ".";
+      return;
+    }
+
+    var pairs = findAttacks(rows);
+    var max = n * (n - 1) / 2;
+    var fitness = max - pairs.length;
+
+    var highlight = focused === null ? [] : [pairs[focused]];
+    if (focused !== null && !pairs[focused]) highlight = [];
+
+    boardOut.appendChild(buildBoard(rows, origin, highlight, n > 8 ? 26 : 34));
+
+    fitOut.textContent = String(fitness);
+    maxOut.textContent = String(max);
+
+    var rowCount = pairs.filter(function (p) { return p.kind === "row"; }).length;
+    var diagCount = pairs.length - rowCount;
+
+    workOut.innerHTML =
+      "max pairs = C(" + n + ",2) = " + n + "×" + (n - 1) + "÷2 = <strong>" + max + "</strong><br>" +
+      "same row: " + rowCount + " &nbsp;·&nbsp; diagonal: " + diagCount + "<br>" +
+      "fitness = " + max + " − " + pairs.length + " = <strong>" + fitness + "</strong>";
+
+    if (pairs.length === 0) {
+      var ok = document.createElement("li");
+      ok.className = "nopairs";
+      ok.style.cursor = "default";
+      ok.textContent = "No attacking pairs — this is a valid solution.";
+      pairOut.appendChild(ok);
+      return;
+    }
+
+    pairs.forEach(function (p, idx) {
+      var li = document.createElement("li");
+      if (focused === idx) li.className = "on";
+      var dc = Math.abs(p.a - p.b);
+      var dr = Math.abs(rows[p.a] - rows[p.b]);
+      li.innerHTML = "<span class='tag'>" + p.kind + "</span> col " +
+        (p.a + origin) + " &amp; col " + (p.b + origin) +
+        " <span style='opacity:.7'>(Δc " + dc + ", Δr " + dr + ")</span>";
+      li.addEventListener("click", function () {
+        focused = (focused === idx) ? null : idx;
+        render();
+      });
+      pairOut.appendChild(li);
+    });
+  }
+
+  window.__ga = { buildBoard: buildBoard, findAttacks: findAttacks };
+
+  input.addEventListener("input", function () { focused = null; render(); });
+  originSel.addEventListener("change", function () { focused = null; render(); });
+
+  document.querySelectorAll(".presets button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      input.value = b.getAttribute("data-c");
+      originSel.value = b.getAttribute("data-o");
+      focused = null;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+
+<script>
+(function () {
+  "use strict";
+
+  var GA = window.__ga;
+  var Q = "♛";
+
+  function el(id) { return document.getElementById(id); }
+  function ri(n) { return Math.floor(Math.random() * n); }
+
+  function pairText(p, rows, origin) {
+    var dc = Math.abs(p.a - p.b), dr = Math.abs(rows[p.a] - rows[p.b]);
+    return p.kind + ": col " + (p.a + origin) + " & col " + (p.b + origin) +
+      " (rows " + (rows[p.a]) + "," + (rows[p.b]) + " — Δc " + dc + ", Δr " + dr + ")";
+  }
+
+  /* ============ MACHINE 1: queens fitness ============ */
+
+  var dq = { rows: null, n: 0, answered: false, streak: 0, best: 0 };
+
+  function dqNew() {
+    var sizes = [5, 6, 6, 8, 8];
+    dq.n = sizes[ri(sizes.length)];
+    dq.rows = [];
+    for (var i = 0; i < dq.n; i++) dq.rows.push(1 + ri(dq.n));
+    dq.answered = false;
+    el("dq-chrom").textContent = dq.rows.join("");
+    el("dq-meta").textContent = dq.n + "-queens · rows numbered 1–" + dq.n +
+      " · max pairs = C(" + dq.n + ",2) = " + (dq.n * (dq.n - 1) / 2);
+    el("dq-ans").value = "";
+    el("dq-ans").className = "ansinput";
+    el("dq-verdict").textContent = "";
+    el("dq-reveal").innerHTML = "";
+  }
+
+  function dqCheck() {
+    if (dq.answered) return;
+    var guess = parseInt(el("dq-ans").value, 10);
+    if (isNaN(guess)) return;
+    dq.answered = true;
+    var pairs = GA.findAttacks(dq.rows);
+    var max = dq.n * (dq.n - 1) / 2;
+    var fit = max - pairs.length;
+    var ok = guess === fit;
+    el("dq-ans").className = "ansinput " + (ok ? "ok" : "no");
+    el("dq-verdict").textContent = ok ? "Correct — " + fit : "Not quite — it's " + fit;
+    el("dq-verdict").className = "verdict " + (ok ? "ok" : "no");
+    dq.streak = ok ? dq.streak + 1 : 0;
+    dq.best = Math.max(dq.best, dq.streak);
+    el("dq-streak").textContent = "streak " + dq.streak + " · best " + dq.best;
+
+    var zone = el("dq-reveal");
+    zone.innerHTML = "";
+    var wrap = document.createElement("div");
+    wrap.className = "boards";
+    var box = document.createElement("div");
+    box.className = "boardbox";
+    box.appendChild(GA.buildBoard(dq.rows, 1, pairs, dq.n > 6 ? 27 : 32));
+    wrap.appendChild(box);
+    zone.appendChild(wrap);
+
+    var list = document.createElement("p");
+    list.className = "drillmeta";
+    var rowC = pairs.filter(function (p) { return p.kind === "row"; }).length;
+    list.innerHTML = pairs.length === 0
+      ? "No attacking pairs — a perfect board. fitness = " + max
+      : "same-row: " + rowC + " · diagonal: " + (pairs.length - rowC) +
+        " · fitness = " + max + " − " + pairs.length + " = <strong>" + fit + "</strong><br>" +
+        pairs.map(function (p) { return pairText(p, dq.rows, 1); }).join("<br>");
+    zone.appendChild(list);
+  }
+
+  el("dq-new").addEventListener("click", dqNew);
+  el("dq-check").addEventListener("click", dqCheck);
+  el("dq-ans").addEventListener("keydown", function (e) { if (e.key === "Enter") dqCheck(); });
+
+  /* ============ MACHINE 2: roulette ============ */
+
+  var FNS = [
+    { label: "x² − 4x", f: function (x) { return x * x - 4 * x; } },
+    { label: "x² − 5x", f: function (x) { return x * x - 5 * x; } },
+    { label: "x² − 6x", f: function (x) { return x * x - 6 * x; } },
+    { label: "x² − 7x", f: function (x) { return x * x - 7 * x; } }
+  ];
+
+  var dr = { pop: [], fs: [], raw: [], total: 0, r: 0, correct: -1, stage: 0, streak: 0, best: 0, fn: null };
+
+  function pad4(x) { var s = x.toString(2); while (s.length < 4) s = "0" + s; return s; }
+
+  function drNew() {
+    dr.fn = FNS[ri(FNS.length)];
+    var xs = [];
+    while (xs.length < 4) {
+      var x = ri(16);
+      if (xs.indexOf(x) < 0) xs.push(x);
+    }
+    dr.pop = xs.map(pad4);
+    dr.raw = xs.map(dr.fn.f);
+    dr.fs = dr.raw.map(function (v) { return Math.max(0, v); });
+    dr.total = dr.fs.reduce(function (a, b) { return a + b; }, 0);
+    if (dr.total === 0) return drNew();
+    dr.stage = 0;
+
+    /* random r that avoids bin edges */
+    var cum = 0, edges = [];
+    dr.fs.forEach(function (f) { cum += f / dr.total; edges.push(cum); });
+    do {
+      dr.r = Math.round((0.02 + Math.random() * 0.96) * 1000) / 1000;
+    } while (edges.some(function (e) { return Math.abs(e - dr.r) < 0.01; }));
+    cum = 0;
+    dr.correct = -1;
+    for (var i = 0; i < 4; i++) {
+      cum += dr.fs[i] / dr.total;
+      if (dr.r <= cum + 1e-9) { dr.correct = i; break; }
+    }
+    if (dr.correct < 0) dr.correct = 3;
+
+    var html = "<table><thead><tr><th>Chromosome</th><th class='num'>x</th><th class='num'>raw f(x) = " +
+      dr.fn.label + "</th></tr></thead><tbody>";
+    for (var j = 0; j < 4; j++) {
+      html += "<tr><td class='mono'>" + dr.pop[j] + "</td><td class='num'>" + parseInt(dr.pop[j], 2) +
+        "</td><td class='num'>" + dr.raw[j] + "</td></tr>";
+    }
+    html += "</tbody></table>";
+    el("dr-pop").innerHTML = html;
+
+    el("dr-total").value = "";
+    el("dr-total").className = "ansinput";
+    el("dr-tverdict").textContent = "";
+    el("dr-verdict").textContent = "";
+    el("dr-step2").style.display = "none";
+    el("dr-reveal").innerHTML = "";
+    el("dr-pick").innerHTML = "";
+  }
+
+  function drCheckTotal() {
+    if (dr.stage !== 0) return;
+    var guess = parseInt(el("dr-total").value, 10);
+    if (isNaN(guess)) return;
+    var ok = guess === dr.total;
+    el("dr-total").className = "ansinput " + (ok ? "ok" : "no");
+    el("dr-tverdict").textContent = ok ? "✓" : "✗ total is " + dr.total + " (clamp negatives to 0)";
+    el("dr-tverdict").className = "verdict " + (ok ? "ok" : "no");
+    if (!ok) { dr.streak = 0; el("dr-streak").textContent = "streak 0 · best " + dr.best; }
+    dr.stage = 1;
+    dr.totalOk = ok;
+
+    el("dr-r").textContent = dr.r.toFixed(3);
+    var pick = el("dr-pick");
+    dr.pop.forEach(function (c, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = c;
+      b.addEventListener("click", function () { drPick(i, b); });
+      pick.appendChild(b);
+    });
+    el("dr-step2").style.display = "flex";
+  }
+
+  function drPick(i, btn) {
+    if (dr.stage !== 1) return;
+    dr.stage = 2;
+    var ok = i === dr.correct;
+    btn.className = ok ? "ok" : "no";
+    if (!ok) el("dr-pick").children[dr.correct].className = "ok";
+    var both = ok && dr.totalOk;
+    el("dr-verdict").textContent = ok ? "Correct parent." : "The right parent is " + dr.pop[dr.correct] + ".";
+    el("dr-verdict").className = "verdict " + (ok ? "ok" : "no");
+    dr.streak = both ? dr.streak + 1 : 0;
+    dr.best = Math.max(dr.best, dr.streak);
+    el("dr-streak").textContent = "streak " + dr.streak + " · best " + dr.best;
+
+    var cum = 0, html = "<div class='tablewrap'><table><thead><tr><th>Chromosome</th><th class='num'>f</th><th class='num'>p</th><th>Bin</th></tr></thead><tbody>";
+    for (var j = 0; j < 4; j++) {
+      var p = dr.fs[j] / dr.total;
+      var lo = cum, hi = cum + p;
+      var binStr = dr.fs[j] === 0 ? "<span class='dim'>— none —</span>"
+        : (lo + 0.001).toFixed(3) + " – " + hi.toFixed(3);
+      html += "<tr" + (j === dr.correct ? " class='best'" : "") + "><td class='mono'>" + dr.pop[j] +
+        "</td><td class='num'>" + dr.fs[j] + (dr.raw[j] < 0 ? " <span class='dim'>(raw " + dr.raw[j] + ")</span>" : "") +
+        "</td><td class='num'>" + p.toFixed(3) + "</td><td class='mono'>" + binStr + "</td></tr>";
+      cum = hi;
+    }
+    html += "</tbody></table></div><p class='drillmeta'>r = " + dr.r.toFixed(3) + " lands in the highlighted bin.</p>";
+    el("dr-reveal").innerHTML = html;
+  }
+
+  el("dr-new").addEventListener("click", drNew);
+  el("dr-checktotal").addEventListener("click", drCheckTotal);
+  el("dr-total").addEventListener("keydown", function (e) { if (e.key === "Enter") drCheckTotal(); });
+
+  /* ============ MACHINE 3: crossover ============ */
+
+  var dx = { p1: "", p2: "", cuts: [], mode: 1, o1: "", o2: "", answered: false, streak: 0, best: 0 };
+
+  function randBits(n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += ri(2);
+    return s;
+  }
+
+  function stripHTML(bits, cuts) {
+    var out = "<span class='bits'>";
+    for (var i = 0; i < bits.length; i++) {
+      var cls = "bit";
+      if (cuts.length === 1 && i > cuts[0]) cls += " tail";
+      if (cuts.length === 2 && i > cuts[0] && i <= cuts[1]) cls += " mid";
+      if (cuts.indexOf(i - 1) >= 0) cls += " cut";
+      out += "<span class='" + cls + "'>" + bits[i] + "</span>";
+    }
+    return out + "</span>";
+  }
+
+  function dxNew() {
+    dx.mode = 1 + ri(2);
+    var n = 8;
+    dx.p1 = randBits(n);
+    dx.p2 = randBits(n);
+    if (dx.mode === 1) {
+      var c = 2 + ri(4);
+      dx.cuts = [c];
+      dx.o1 = dx.p1.slice(0, c + 1) + dx.p2.slice(c + 1);
+      dx.o2 = dx.p2.slice(0, c + 1) + dx.p1.slice(c + 1);
+    } else {
+      var a = 1 + ri(3), b = a + 2 + ri(2);
+      if (b > 6) b = 6;
+      dx.cuts = [a, b];
+      dx.o1 = dx.p1.slice(0, a + 1) + dx.p2.slice(a + 1, b + 1) + dx.p1.slice(b + 1);
+      dx.o2 = dx.p2.slice(0, a + 1) + dx.p1.slice(a + 1, b + 1) + dx.p2.slice(b + 1);
+    }
+    dx.answered = false;
+
+    el("dx-parents").innerHTML =
+      "<div class='strip'><span class='lbl'>P1</span>" + stripHTML(dx.p1, dx.cuts) + "</div>" +
+      "<div class='strip'><span class='lbl'>P2</span>" + stripHTML(dx.p2, dx.cuts) + "</div>";
+    el("dx-rule").textContent = dx.mode === 1
+      ? "One-point crossover — cut after position " + (dx.cuts[0] + 1) + " (shaded tails swap)."
+      : "Two-point crossover — cuts after positions " + (dx.cuts[0] + 1) + " and " + (dx.cuts[1] + 1) + " (shaded middle swaps).";
+    el("dx-o1").value = "";
+    el("dx-o2").value = "";
+    el("dx-o1").className = "ansinput wide";
+    el("dx-o2").className = "ansinput wide";
+    el("dx-verdict").textContent = "";
+    el("dx-reveal").innerHTML = "";
+  }
+
+  function dxCheck() {
+    if (dx.answered) return;
+    var g1 = (el("dx-o1").value || "").replace(/\s/g, "");
+    var g2 = (el("dx-o2").value || "").replace(/\s/g, "");
+    if (!g1 || !g2) return;
+    dx.answered = true;
+    /* accept offspring in either order */
+    var direct = g1 === dx.o1 && g2 === dx.o2;
+    var swapped = g1 === dx.o2 && g2 === dx.o1;
+    var ok = direct || swapped;
+    el("dx-o1").className = "ansinput wide " + (ok ? "ok" : (g1 === dx.o1 || g1 === dx.o2 ? "ok" : "no"));
+    el("dx-o2").className = "ansinput wide " + (ok ? "ok" : (g2 === dx.o1 || g2 === dx.o2 ? "ok" : "no"));
+    el("dx-verdict").textContent = ok ? "Correct." : "Not quite.";
+    el("dx-verdict").className = "verdict " + (ok ? "ok" : "no");
+    dx.streak = ok ? dx.streak + 1 : 0;
+    dx.best = Math.max(dx.best, dx.streak);
+    el("dx-streak").textContent = "streak " + dx.streak + " · best " + dx.best;
+
+    el("dx-reveal").innerHTML =
+      "<div class='strip'><span class='lbl'>O1</span>" + stripHTML(dx.o1, dx.cuts) + "</div>" +
+      "<div class='strip'><span class='lbl'>O2</span>" + stripHTML(dx.o2, dx.cuts) + "</div>";
+  }
+
+  el("dx-new").addEventListener("click", dxNew);
+  el("dx-check").addEventListener("click", dxCheck);
+  el("dx-o2").addEventListener("keydown", function (e) { if (e.key === "Enter") dxCheck(); });
+
+  /* ============ EXAM MODE ============ */
+
+  function markExam() {
+    var score = 0;
+    var notes = [];
+
+    /* Q1a: 2 */
+    var a1 = el("e1a").value === "sb", a2 = el("e1b").value === "comb";
+    score += (a1 ? 1 : 0) + (a2 ? 1 : 0);
+    notes.push("Q1(a): " + ((a1 ? 1 : 0) + (a2 ? 1 : 0)) + "/2 — stochastic beam search · combining two parent states.");
+
+    /* Q1b: 2, honesty ticks */
+    var ticks = el("e1steps").querySelectorAll("input:checked").length;
+    var sb = Math.round(ticks * 2 / 6 * 10) / 10;
+    score += sb;
+    notes.push("Q1(b): " + sb + "/2 — you ticked " + ticks + "/6 steps.");
+
+    /* Q2: row=1 (1), diag=1 (2), fitness=26 (3) */
+    var q2 = 0;
+    if (parseInt(el("e2r").value, 10) === 1) q2 += 1;
+    if (parseInt(el("e2d").value, 10) === 1) q2 += 2;
+    if (parseInt(el("e2f").value, 10) === 26) q2 += 3;
+    mark(el("e2r"), parseInt(el("e2r").value, 10) === 1);
+    mark(el("e2d"), parseInt(el("e2d").value, 10) === 1);
+    mark(el("e2f"), parseInt(el("e2f").value, 10) === 26);
+    score += q2;
+    notes.push("Q2: " + q2 + "/6 — same-row 1 (cols 5&6, row 3), diagonal 1 (cols 5&7, Δ2/Δ2), fitness 28 − 2 = 26.");
+
+    /* Q3: total 214 (2), parents (1+1+2) */
+    var q3 = 0;
+    var tOk = parseInt(el("e3t").value, 10) === 214;
+    if (tOk) q3 += 2;
+    mark(el("e3t"), tOk);
+    var sels = [["e3s1", "1111", 1], ["e3s2", "1010", 1], ["e3s3", "0111", 2]];
+    sels.forEach(function (s) {
+      var ok = el(s[0]).value === s[1];
+      if (ok) q3 += s[2];
+      el(s[0]).style.borderColor = ok ? "var(--accent)" : "var(--attack)";
+    });
+    score += q3;
+    notes.push("Q3: " + q3 + "/6 — total 150+0+50+14 = 214 (0100 raw −4 clamps to 0, no bin); bins 0.001–0.701 / 0.702–0.935 / 0.936–1.000; draws → 1111, 1010, 0111.");
+
+    /* Q4: o1 (1), o2 (1), mutation (2) */
+    var q4 = 0;
+    var o1 = (el("e4o1").value || "").replace(/\s/g, "");
+    var o2 = (el("e4o2").value || "").replace(/\s/g, "");
+    var O1 = "41574825", O2 = "36182736";
+    var oOk1 = o1 === O1 || o1 === O2;
+    var oOk2 = (o2 === O1 || o2 === O2) && o2 !== o1;
+    if (oOk1) q4 += 1;
+    if (oOk2) q4 += 1;
+    mark(el("e4o1"), oOk1);
+    mark(el("e4o2"), oOk2);
+    var mOk = el("e4m").value === "digit";
+    if (mOk) q4 += 2;
+    el("e4m").style.borderColor = mOk ? "var(--accent)" : "var(--attack)";
+    score += q4;
+    notes.push("Q4: " + q4 + "/4 — O1 = 415|74825, O2 = 361|82736; mutation = change one digit, moving a queen within its column.");
+
+    score = Math.round(score * 10) / 10;
+    el("exam-score").textContent = score + " / 20";
+    el("exam-fill").style.width = (score / 20 * 100) + "%";
+
+    var verdictLine = score >= 16 ? "Ready. Skim the traps list the morning of, and sleep."
+      : score >= 11 ? "Solid. Look at which question cost you and run that drill machine above until the streak hits 5."
+      : "Work the study sections again top to bottom, drill each machine to a streak of 5, then re-sit this. It clicks with repetition — the counting is mechanical.";
+
+    el("exam-reveal").innerHTML =
+      "<div class='panel'><p class='panel-label'>Marking notes</p><p style='margin:0;font-size:15px'>" +
+      notes.join("<br>") + "</p></div><div class='panel " + (score >= 16 ? "" : "warn") +
+      "'><p class='panel-label'>Verdict</p><p style='margin:0'><strong>" + score + " / 20.</strong> " + verdictLine + "</p></div>";
+  }
+
+  function mark(input, ok) {
+    input.className = input.className.replace(/ (ok|no)/g, "") + (ok ? " ok" : " no");
+  }
+
+  el("exam-mark").addEventListener("click", markExam);
+
+  /* init */
+  dqNew();
+  drNew();
+  dxNew();
+})();
+</script>
